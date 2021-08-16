@@ -156,17 +156,3 @@ while stop_game is False:
         else:
             decide = input("If you want to play again enter \"yes\", if you wish to quit enter \"no\": ")
     os.remove("temp.txt")  # Delete file (no longer needed)
-
-"""
--> ask users which categories they want words from
--> store category files in one file
--> get one random word from the file
--> create the underlines of the word to guess
--> replace correct guesses with the hidden underlines word
--> check if so far the game works
--> add a bank for wrong guesses so they won't be used again
--> make sure all chars are legal
--> make sure when upper-lower chars are used, it's ok
--> make it possible to change word if game ends and another round to be played
-*****-> make it possible to change word if player wishes that (reset game with same category) 
-"""

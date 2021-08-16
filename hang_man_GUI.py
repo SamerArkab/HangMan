@@ -57,11 +57,8 @@ def main_menu_():
     start_btn = Button(root, text="New Game", width=15, command=new_game, borderwidth=5)
     canvas.create_window(400, 150, anchor=CENTER, window=start_btn)
 
-    score_btn = Button(root, text="Score Board", width=15, command=score_board, borderwidth=5)
-    canvas.create_window(400, 210, anchor=CENTER, window=score_btn)
-
     quit_btn = Button(root, text="Quit", width=15, command=quit_game, borderwidth=5)
-    canvas.create_window(400, 270, anchor=CENTER, window=quit_btn)
+    canvas.create_window(400, 200, anchor=CENTER, window=quit_btn)
 
     music_btn = Button(root, text="Music", command=play_music)
     canvas.create_window(770, 380, anchor=CENTER, window=music_btn)
@@ -535,10 +532,6 @@ def play(hidden, word, count):
 
     music_btn = Button(play_window, text="Music", command=play_music)
     canvas_play.create_window(770, 380, anchor=CENTER, window=music_btn)
-
-
-def score_board():
-    return
 
 
 def quit_game():
