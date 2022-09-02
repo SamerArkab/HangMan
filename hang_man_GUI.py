@@ -5,23 +5,9 @@ from PIL import ImageTk, Image
 from tkinter import messagebox
 import pygame
 
-# Window settings
-root = Tk()
-root.title("HangMan")
-root.iconbitmap("images/icon.ico")
-root.geometry("800x400")
-root.resizable(width=False, height=False)
-
 
 def disable_event():
     pass
-
-
-root.protocol("WM_DELETE_WINDOW", disable_event)  # Disable window "X" (close) button
-
-
-pygame.mixer.init()
-music_state = False
 
 
 def play_music():
@@ -30,7 +16,7 @@ def play_music():
     if music_state:
         pygame.mixer.music.stop()
     else:
-        pygame.mixer.music.load("music/The Witcher 3 OST.mp3")
+        pygame.mixer.music.load("music/the_last_of_us_-_main_menu_ost.mp3")
         pygame.mixer.music.play(loops=0)
     music_state = not music_state
 
@@ -107,13 +93,13 @@ def new_game():
     canvas_new_game.create_window(440, 170, anchor=CENTER, window=tv_btn)
 
     start_new_game_btn = Button(new_game_window, text="Start new game", width=15,
-                                command=lambda: [prepare(var1.get() + var2.get() + var3.get() + var4.get())]
-                                , borderwidth=5)
+                                command=lambda: [prepare(var1.get() + var2.get() + var3.get() + var4.get())],
+                                borderwidth=5)
     canvas_new_game.create_window(390, 220, anchor=CENTER, window=start_new_game_btn)
 
     back_menu_btn = Button(new_game_window, text="Main Menu", width=15, command=lambda: [main_menu_(),
-                                                                                         new_game_window.destroy()]
-                           , borderwidth=5)
+                                                                                         new_game_window.destroy()],
+                           borderwidth=5)
     canvas_new_game.create_window(390, 260, anchor=CENTER, window=back_menu_btn)
 
     # quit_game_btn = Button(new_game_window, text="Quit game", width=15, command=quit_game)
@@ -128,10 +114,10 @@ def prepare(choice):
     global count_lines
 
     # Create file of words
-    movies = open("movies list.txt", "r")  # Open word files
-    games = open("games list.txt", "r")
-    tv = open("tv list.txt", "r")
-    anime = open("anime list.txt", "r")
+    movies = open("lists/movies list.txt", "r")  # Open word files
+    games = open("lists/games list.txt", "r")
+    tv = open("lists/tv list.txt", "r")
+    anime = open("lists/anime list.txt", "r")
     categories = ""
     file = open("temp.txt", "a+")  # File which will contain words from chosen categories
     if "a" or "g" or "m" or "t" in choice:
@@ -151,7 +137,7 @@ def prepare(choice):
             categories += "Anime / "
             for t in anime.readlines():
                 file.write(t)
-        categories = categories[0:-3]  # Will go in label
+        # categories = categories[0:-3]  # Will go in label
     movies.close()  # Close word files
     anime.close()
     tv.close()
@@ -196,7 +182,7 @@ def get_chars_count(count_chars):
 
 
 def get_lines_count(file):
-    return sum(1 for line in file)  # For each line count 1+1+...
+    return sum(1 for _ in file)  # Count lines
 
 
 def get_word(random_number):
@@ -234,7 +220,7 @@ def option_a():
     # Get random word to guess
     random_num = random.randint(1, count_lines)  # Get a random integer
     word_to_guess = get_word(random_num)
-    word_to_guess = word_to_guess[0:-1]  # Remove the "\n" char
+    word_to_guess = word_to_guess[0:-1]  # Remove the break new line ("\n") char
 
     # Count word chars
     chars_count = get_chars_count(list(word_to_guess))
@@ -260,16 +246,16 @@ def option_b():
         option_window.destroy()
         return
 
-    answer_b = list(wordd)  # When done, do - "".join(list to join as string)
-    upper_word = wordd.upper()
+    answer_b = list(the_word)  # When done, do - "".join(list to join as string)
+    upper_word = the_word.upper()
     upper_word_list_b = list(upper_word)
 
-    len_wordd = len(wordd) - 1
+    len_the_word = len(the_word) - 1
     used_check = True
 
     while used_check:
-        random_num = random.randint(0, len_wordd)
-        char_reveal = wordd[random_num]
+        random_num = random.randint(0, len_the_word)
+        char_reveal = the_word[random_num]
 
         if char_reveal.upper() not in str(chars_bank).upper() and char_reveal not in " ":
             chars_bank += char_reveal
@@ -356,7 +342,7 @@ def assistance():
 def my_answer():
     global chars_bank
 
-    global wordd
+    global the_word
 
     global counter
 
@@ -384,8 +370,8 @@ def my_answer():
         if len_align == 0:
             chars_bank += "\n"
         chars_bank += e.get()[0:1]
-        if e.get()[0:1].upper() in str(answer).upper():  # upper in order to ignore if the letter is written
-            while e.get()[0:1].upper() in str(answer).upper():  # Check if its there more than once
+        if e.get()[0:1].upper() in str(answer).upper():
+            while e.get()[0:1].upper() in str(answer).upper():  # Check if letter appears more than once
                 i = upper_word_list.index(e.get()[0:1].upper())  # Returns index of the letter guessed
                 under_lines[i] = answer[i]
                 answer[i] = " "
@@ -401,6 +387,8 @@ def my_answer():
                             os.remove("temp.txt")  # Delete file (no longer needed)
                         new_game_window.destroy()
                         play_window.destroy()
+                        letter_change = 1
+                        word_change = 2
                         root.deiconify()
         else:
             guesses -= 1
@@ -424,7 +412,7 @@ def my_answer():
                 play_bg0 = ImageTk.PhotoImage(Image.open("images/0guesses.jpg").resize((800, 450), Image.ANTIALIAS))
                 canvas_play.background = play_bg0
                 canvas_play.create_image(0, 0, anchor=NW, image=play_bg0)
-                messagebox.showinfo("LOSER", "You lose!\nThe word was: " + wordd)
+                messagebox.showinfo("LOSER", "You lose!\nThe word was: " + the_word)
                 answer_ = messagebox.askyesno("HangMan", "Would you like to play again?")
                 if answer_ == 0:
                     quit_game()
@@ -439,9 +427,6 @@ def my_answer():
 
     e.delete(0, "end")
 
-    # letters_left_lbl = Label(play_window, text=str(counter) + " letters left to solve the word")
-    # canvas_play.create_window(400, 370, anchor=CENTER, window=letters_left_lbl)
-    #
     list_chars_bank = list(chars_bank)
     bank_lbl = Label(play_window, text="Used characters bank:\n" + " ".join(list_chars_bank).upper())
     canvas_play.create_window(70, 270, anchor=CENTER, window=bank_lbl)
@@ -465,8 +450,8 @@ def play(hidden, word, count):
     global answer
     global upper_word_list
     global under_lines
-    global wordd
-    wordd = word
+    global the_word
+    the_word = word
 
     global guesses
     guesses = 5
@@ -497,15 +482,12 @@ def play(hidden, word, count):
     canvas_play.background = play_bg
     canvas_play.create_image(0, 0, anchor=NW, image=play_bg)
 
-    under_lines = list(hidden)  # Will make it easier to change chars in string
-    answer = list(word)  # When done, do - "".join(list to join as string)
+    under_lines = list(hidden)  # Will make it easier to change chars
+    answer = list(word)  # When done, do - "".join(!!list to join as string!!)
     upper_word = word.upper()
     upper_word_list = list(upper_word)
     chars_bank = ""
 
-    # letters_left_lbl = Label(play_window, text=str(counter) + " letters left to solve the word")
-    # canvas_play.create_window(400, 370, anchor=CENTER, window=letters_left_lbl)
-    #
     underlines_lbl = Label(play_window, text=" ".join(under_lines))
     canvas_play.create_window(400, 310, anchor=CENTER, window=underlines_lbl)
 
@@ -538,6 +520,35 @@ def quit_game():
     if os.path.isfile("temp.txt"):  # In case the file was created
         os.remove("temp.txt")  # Delete file (no longer needed)
     root.destroy()
+
+
+# Window settings
+root = Tk()
+root.title("HangMan")
+root.iconbitmap("images/icon.ico")
+root.geometry("800x400")
+root.resizable(width=False, height=False)
+
+root.protocol("WM_DELETE_WINDOW", disable_event)  # Disable window "X" (close) button
+
+pygame.mixer.init()
+music_state = False
+
+
+# Not an optimal solution, but for a small program such as this,
+# using global instances helps with communicating between the different methods
+
+letter_change = 1
+word_change = 2
+count_lines = 0
+chars_bank = ""
+counter = 0
+the_word = ""
+guesses = 5
+list_chars_bank = list("")
+under_lines = list("")
+answer = list("")
+upper_word_list = list("")
 
 
 main_menu_()  # Start game

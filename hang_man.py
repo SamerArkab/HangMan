@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 main_menu = [
     "Welcome to HangMan!\nPlease choose one or more categories to generate words from:",
@@ -11,53 +12,56 @@ main_menu = [
 
 
 def run_menu():
-    movies = open("movies list.txt", "r")  # Open word files
-    games = open("games list.txt", "r")
-    tv = open("tv list.txt", "r")
-    anime = open("anime list.txt", "r")
-    for main in main_menu:
-        print(main)
+    movies = open("lists/movies list.txt", "r")  # Open word files in read mode
+    games = open("lists/games list.txt", "r")
+    tv = open("lists/tv list.txt", "r")
+    anime = open("lists/anime list.txt", "r")
+    for row in main_menu:
+        print(row)
     categories = ""
     answer = input()
-    file = open("temp.txt", "a+")  # File which will contain words from chosen categories
-    while "a" or "b" or "c" or "d" in answer:
+    answer = answer.lower()
+    answer = answer.replace(" ", "")
+    file = open("temp.txt", "a+")  # File which will contain words from chosen categories (reading and appending mode)
+    if not re.findall("[e-z]", answer) and answer.isalpha():  # answer only contains the letters "abcd"
         if "a" in answer:
             categories += "Movies + "
-            for i in movies.readlines():
-                file.write(i)
+            for line in movies.readlines():  # Read file and split new lines on "\n"
+                file.write(line)
             movies.close()  # Close word files
         if "b" in answer:
             categories += "Games + "
-            for j in games.readlines():
-                file.write(j)
+            for line in games.readlines():
+                file.write(line)
             games.close()
         if "c" in answer:
             categories += "TV-Shows + "
-            for k in tv.readlines():
-                file.write(k)
+            for line in tv.readlines():
+                file.write(line)
             tv.close()
         if "d" in answer:
             categories += "Anime + "
-            for t in anime.readlines():
-                file.write(t)
+            for line in anime.readlines():
+                file.write(line)
             anime.close()
-        categories = categories[0:-3]
+        categories = categories[0:-3]  # Remove final " + " (which is added manually)
         file.close()
         print("\nA game of HangMan (" + categories + ") will begin:\n")
         return True
-    print("The menu will reset, enter one or more of the categories below (a, b or c).\n")
-    return False
+    else:
+        print("MENU RESET. Enter one or more of the categories below (a, b, c or d).\n", end='')
+        return False
 
 
 def get_word(random_number):
     f = open("temp.txt", "r")
-    lines = f.readlines()
-    ret = lines[random_number-1]
+    lines = f.read().splitlines()  # Remove the break new line ("\n") at the end of line
+    ret = lines[random_number - 1]
     return ret
 
 
 def get_lines_count(file):
-    return sum(1 for line in file)  # For each line count 1+1+...
+    return sum(1 for _ in file)  # Count 1 for each line
 
 
 def get_chars_count(count_chars):
@@ -91,18 +95,18 @@ def play(hidden, word, count):
     while playing:
         bank_check = True
         user_guess = input("\n\nEnter a character: \n")
-        while user_guess in "\n =+-*/.`~!@#$%^&*()_,';:":
+        while re.findall("[^a-z0-9]", user_guess.lower()) or len(user_guess) != 1:
             print("Illegal input, please enter a character in the range of (a-z) and (0-9):")
             user_guess = input()
-            chars_bank += user_guess
         while bank_check:
             if user_guess in chars_bank:
-                user_guess = input("Input was used before. Enter a character in the range of (a-z) and (0-9):\n")
+                user_guess = input("[" + user_guess + "] was used before. Enter a character in the range of (a-z) and "
+                                                      "(0-9):\n")
             else:
                 chars_bank += user_guess
                 bank_check = False
-        if user_guess.upper() in str(answer).upper():  # upper in order to ignore if the letter is written
-            while user_guess.upper() in str(answer).upper():  # in upper case or lower case
+        if user_guess.upper() in str(answer).upper():  # Upper in order to ignore if the letter is written in lower case
+            while user_guess.upper() in str(answer).upper():
                 i = upper_word_list.index(user_guess.upper())  # Returns index of the letter guessed
                 under_lines[i] = answer[i]
                 answer[i] = " "
@@ -135,9 +139,9 @@ while stop_game is False:
     count_lines = get_lines_count(categories_file)
     categories_file.close()
 
-    random_num = random.randint(1, count_lines)  # Get a random integer
+    random_num = random.randint(1, count_lines)  # Get a random integer in lines range
     word_to_guess = get_word(random_num)
-    word_to_guess = word_to_guess[0:-1]  # Remove the "\n" char
+    word_to_guess = word_to_guess[0:]
 
     chars_count = get_chars_count(list(word_to_guess))
 
