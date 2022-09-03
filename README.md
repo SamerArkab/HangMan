@@ -8,7 +8,7 @@
 * [Example run](#example-run)
 
 #### General Info
-Getting familiar with the fundamentals of Python (Tkinter-GUI) by writing HangMan game as my first Python project, while making sure no edge cases were left unattended to.
+Getting familiar with the fundamentals of Python (Tkinter-GUI) by writing HangMan game as my first Python project, while making sure no edge cases were left unattended!
 
 #### Technologies
 * Python 3.8
